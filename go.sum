@@ -1,0 +1,16 @@
+github.com/gorcon/rcon v1.4.0 h1:pYwZ8Rhcgfh/LhdPBncecuEo5thoFvPIuMSWovz1FME=
+github.com/gorcon/rcon v1.4.0/go.mod h1:M6v6sNmr/NET9YIf+2rq+cIjTBridoy62uzQ58WgC1I=
+github.com/lmorg/murex v0.0.0-20250115225944-b4c429617fd4 h1:JCEM0M0HAN8m1T7GeNjIaJJUyBR/ykRvGR15/aZcK7s=
+github.com/lmorg/murex v0.0.0-20250115225944-b4c429617fd4/go.mod h1:flXYnXpFa6j4keWDv0plQDvy5gfyw0ifSa28IT95cZA=
+github.com/lmorg/readline/v4 v4.2.4 h1:dAXnXP/oEpbd5vghcgmJfwVhw4LCXjKlIIhFXuT43K0=
+github.com/lmorg/readline/v4 v4.2.4/go.mod h1:Zdp/tnRZl0eTssyikMGSp61wOZwxJLw/CtK2sE2f9e8=
+github.com/mattn/go-runewidth v0.0.16 h1:E5ScNMtiwvlvB5paMFdw9p4kSQzbXFikJ5SQO6TULQc=
+github.com/mattn/go-runewidth v0.0.16/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh153qUoGf23w=
+github.com/renatopp/go-cli v0.4.0 h1:93AYCf256GblcykLxbkp7X1B51O+EN6Bump5FhgpHkE=
+github.com/renatopp/go-cli v0.4.0/go.mod h1:jE5zjrOlCvEEAUH4paBs7dxLrBw7HO+1XQQU6Ge0P7Q=
+github.com/renatopp/x v0.0.6 h1:rEpvjcZlomcmUrFQ++lI6BWfQrhdp7OGNpfcr9Qsu3o=
+github.com/renatopp/x v0.0.6/go.mod h1:dZtw9ZdQBPGSVfVFQsRJTIZSwKAdfgNYz3jt68mcJrw=
+github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
+github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
+golang.org/x/sys v0.32.0 h1:s77OFDvIQeibCmezSnk/q6iAfkdiQaJi4VzroCFrN20=
+golang.org/x/sys v0.32.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=
