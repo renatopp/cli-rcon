@@ -21,5 +21,14 @@ Options:
 Arguments:
   address           (required) The host and port of the RCON server
   commands          The RCON commands to execute
-
 ```
+
+Examples:
+
+- Send an RCON:
+
+  `rcon -p password 127.0.0.1:27015 "say Hello, world!"`
+
+- Open RCON REPL:
+
+  `rcon -p password 127.0.0.1:27015`

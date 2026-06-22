@@ -9,6 +9,7 @@ import (
 	"github.com/gorcon/rcon"
 	"github.com/lmorg/readline/v4"
 	"github.com/renatopp/go-cli"
+	"github.com/renatopp/x/fmtx"
 	"github.com/renatopp/x/strx"
 )
 
@@ -50,10 +51,25 @@ The REPL is enabled when no commands are provided.`)
 	cli.FatalIf(err)
 }
 
+func send(conn *rcon.Conn, cmds ...string) {
+	for _, cmd := range cmds {
+		output, err := conn.Execute(cmd)
+		cli.FatalIf(err)
+		if output == "" {
+			continue
+		}
+		cli.Print("%s", fmtx.Dim(output))
+	}
+}
+
 func repl(conn *rcon.Conn, autocomplete bool) {
 	rl := readline.NewInstance()
 	rl.SetPrompt(" > ")
 	rl.MaxTabCompleterRows = 12
+
+	var currentLine string
+	trackLine := func(line []rune) { currentLine = string(line) }
+
 	if autocomplete {
 		parseCommands()
 		rl.TabCompleter = func(line []rune, pos int, _ readline.DelayedTabContext) *readline.TabCompleterReturnT {
@@ -82,6 +98,7 @@ func repl(conn *rcon.Conn, autocomplete bool) {
 			}
 		}
 		rl.HintText = func(line []rune, pos int) []rune {
+			trackLine(line)
 			fields := strx.Fields(string(line))
 			if len(fields) == 0 {
 				return nil
@@ -103,15 +120,20 @@ func repl(conn *rcon.Conn, autocomplete bool) {
 			return nil
 		}
 
-		for ch := rune(32); ch <= 126; ch++ {
-			rl.AddEvent(string(ch), func(_ int, state *readline.EventState) *readline.EventReturn {
-				return &readline.EventReturn{
-					SetLine:  []rune(state.Line),
-					SetPos:   state.CursorPos,
-					Actions:  []func(*readline.Instance){readline.HkFnModeAutocomplete},
-					Continue: true,
-				}
-			})
+		// for ch := rune(32); ch <= 126; ch++ {
+		// 	rl.AddEvent(string(ch), func(_ int, state *readline.EventState) *readline.EventReturn {
+		// 		return &readline.EventReturn{
+		// 			SetLine:  []rune(state.Line),
+		// 			SetPos:   state.CursorPos,
+		// 			Actions:  []func(*readline.Instance){readline.HkFnModeAutocomplete},
+		// 			Continue: true,
+		// 		}
+		// 	})
+		// }
+	} else {
+		rl.HintText = func(line []rune, _ int) []rune {
+			trackLine(line)
+			return nil
 		}
 	}
 
@@ -119,6 +141,10 @@ func repl(conn *rcon.Conn, autocomplete bool) {
 		line, err := rl.Readline()
 		if err != nil {
 			if err == readline.ErrCtrlC {
+				if currentLine != "" {
+					currentLine = ""
+					continue
+				}
 				return
 			}
 			cli.FatalIf(err)
@@ -138,14 +164,6 @@ func repl(conn *rcon.Conn, autocomplete bool) {
 			println("\033c")
 			continue
 		}
-	}
-}
-
-func send(conn *rcon.Conn, cmds ...string) {
-	for _, cmd := range cmds {
-		output, err := conn.Execute(cmd)
-		cli.FatalIf(err)
-		cli.Print("%s", output)
 	}
 }
 
