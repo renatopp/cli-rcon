@@ -5,7 +5,7 @@ CLI for RCON.
 ## Installation
 
 ```bash
-go install github.com/renatopp/go-rcon@latest
+go install github.com/renatopp/go-rcon/cmd/rcon@latest
 ```
 
 ## Usage

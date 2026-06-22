@@ -1,20 +1,16 @@
-package main
+package internal
 
 import (
 	"bytes"
-	_ "embed"
 	"encoding/csv"
 	"sort"
 
 	"github.com/gorcon/rcon"
 	"github.com/lmorg/readline/v4"
-	"github.com/renatopp/go-cli"
+	globals "github.com/renatopp/go-rcon"
 	"github.com/renatopp/x/fmtx"
 	"github.com/renatopp/x/strx"
 )
-
-//go:embed commands.csv
-var commandsCsv string
 
 type command struct {
 	defaultValue string
@@ -27,42 +23,7 @@ var (
 	commandMap   map[string]command
 )
 
-func main() {
-	cli.Name("rcon")
-	cli.Description(`RCON client.
-The REPL is enabled when no commands are provided.`)
-	cli.AutoHelp(true)
-	address := cli.Pos("address", "The host and port of the RCON server").AsRequired()
-	commands := cli.Pos("commands", "The RCON commands to execute").AsVariadic()
-	password := cli.Flag("pass", "p", "Server RCON password")
-	noAutocomplete := cli.FlagBool("no-autocomplete", "", "Disable autocomplete")
-
-	cli.Parse()
-
-	conn, err := rcon.Dial(address.Value(), password.Value())
-	cli.FatalIf(err)
-	defer conn.Close()
-
-	if len(commands.Values()) == 0 {
-		repl(conn, !noAutocomplete.Value())
-	} else {
-		send(conn, commands.Values()...)
-	}
-	cli.FatalIf(err)
-}
-
-func send(conn *rcon.Conn, cmds ...string) {
-	for _, cmd := range cmds {
-		output, err := conn.Execute(cmd)
-		cli.FatalIf(err)
-		if output == "" {
-			continue
-		}
-		cli.Print("%s", fmtx.Dim(output))
-	}
-}
-
-func repl(conn *rcon.Conn, autocomplete bool) {
+func StartRepl(conn *rcon.Conn, autocomplete bool) error {
 	rl := readline.NewInstance()
 	rl.SetPrompt(" > ")
 	rl.MaxTabCompleterRows = 12
@@ -119,17 +80,6 @@ func repl(conn *rcon.Conn, autocomplete bool) {
 			}
 			return nil
 		}
-
-		// for ch := rune(32); ch <= 126; ch++ {
-		// 	rl.AddEvent(string(ch), func(_ int, state *readline.EventState) *readline.EventReturn {
-		// 		return &readline.EventReturn{
-		// 			SetLine:  []rune(state.Line),
-		// 			SetPos:   state.CursorPos,
-		// 			Actions:  []func(*readline.Instance){readline.HkFnModeAutocomplete},
-		// 			Continue: true,
-		// 		}
-		// 	})
-		// }
 	} else {
 		rl.HintText = func(line []rune, _ int) []rune {
 			trackLine(line)
@@ -145,9 +95,9 @@ func repl(conn *rcon.Conn, autocomplete bool) {
 					currentLine = ""
 					continue
 				}
-				return
+				return nil
 			}
-			cli.FatalIf(err)
+			return err
 		}
 
 		if len(line) == 0 {
@@ -155,13 +105,18 @@ func repl(conn *rcon.Conn, autocomplete bool) {
 		}
 
 		if line == "exit" {
-			return
+			return nil
 		}
 
-		send(conn, line)
-
+		output, err := conn.Execute(line)
+		if err != nil {
+			return err
+		}
+		if output != "" {
+			fmtx.Println("%s", fmtx.Dim(output))
+		}
 		if line == "clear" {
-			println("\033c")
+			fmtx.Print("\033c")
 			continue
 		}
 	}
@@ -170,7 +125,7 @@ func repl(conn *rcon.Conn, autocomplete bool) {
 func parseCommands() {
 	commandMap = make(map[string]command)
 
-	r := csv.NewReader(bytes.NewBufferString(commandsCsv))
+	r := csv.NewReader(bytes.NewBufferString(globals.CommandsCsv))
 	records, err := r.ReadAll()
 	if err != nil || len(records) < 2 {
 		return
